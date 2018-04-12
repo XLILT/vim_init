@@ -36,7 +36,7 @@ fi
 
 cp vimrc.bundles ~/.vimrc.bundles
 
-vim "+PluginInstall" "+q" "+q"
+vim "+PluginInstall" "+qa"
 
 cd $CURDIR
 
