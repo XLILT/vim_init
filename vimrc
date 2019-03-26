@@ -7,6 +7,40 @@ nmap <leader>w :w!<cr>
 nmap <leader>q :q!<cr>
 nmap <leader>f :vim /<c-r><c-w>/gj **/*.cpp **/*.h \| copen
 nmap <F1> :qa!<cr>
+" 映射全选+复制 ctrl+a
+"map <C-A> ggVGY
+"map! <C-A> <Esc>ggVGY
+""map <F12> gg=G
+" 选中状态下 Ctrl+c 复制
+""vmap <C-c> "+y
+"去空行
+"nnoremap <F2> :g/^\s*$/d<CR>
+"比较文件
+""nnoremap <C-F2> :vert diffsplit
+"新建标签
+"map <M-F2> :tabnew<CR>
+"列出当前目录文件
+"map <F3> :tabnew .<CR>
+"打开树状文件目录
+"map <C-F3> \be
+"C，C++ 按F5编译运行
+"map <F5> :call CompileRunGcc()<CR>
+"func! CompileRunGcc()
+"    exec "w"
+"    echo &filetype
+"    if &filetype == 'c'
+"        exec "!scons"
+"        "exec "!gcc % -o %<"
+"        "exec "! ./%<"
+"    elseif &filetype == 'cpp'
+"        exec "!scons"
+"    elseif &filetype == 'java'
+"        exec "!javac %"
+"        exec "!java %<"
+"    elseif &filetype == 'sh'
+"        :!./%
+"    endif
+"endfunc
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vunble
@@ -36,7 +70,8 @@ set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strf
 "set laststatus=1    " 启动显示状态行(1),总是显示状态行(2)
 "set foldenable      " 允许折叠
 "set foldmethod=manual   " 手动折叠
-set nocompatible  "去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
+" 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
+set nocompatible  
 
 " 显示中文帮助
 if version >= 603
@@ -59,6 +94,67 @@ set encoding=utf-8
 set fileencodings=utf-8
 set fileencoding=utf-8
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 新文件标题
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"新建.c,.h,.sh,.java文件，自动插入文件头
+autocmd BufNewFile *.[ch],*.[ch]pp,*.sh,*.pl,*.java,*.py,*.go exec ":call SetTitle()"
+""定义函数SetTitle，自动插入文件头
+func SetTitle()
+    exec "lan en_US.utf-8"
+    if &filetype == 'sh' || &filetype == 'python' || &filetype == 'perl'
+        if &filetype == 'sh'
+            call append(line(".") - 1, "\#!/usr/bin/env bash")
+            call append(line(".") - 1, "")
+        elseif &filetype== 'perl'
+            call append(line(".") - 1, "\#!/usr/bin/env perl")
+            call append(line(".") - 1, "")
+        elseif &filetype == 'python'
+            call append(line(".") - 1, "\#!/usr/bin/env python")
+            call append(line(".") - 1, "\#*-* coding:utf-8 *-*")
+            call append(line(".") - 1, "")
+        endif
+
+        call append(line(".") - 1,     "\################################################")
+        call append(line(".") - 1,     "\# File Name: ".expand("%"))
+        call append(line(".") - 1,     "\# Author: mxl")
+        call append(line(".") - 1,     "\# Mail: xiaolongicx@gmail.com")
+        call append(line(".") - 1,     "\# Created Time: ".strftime("%Y-%m-%d %H:%M"))
+        call append(line(".") - 1,     "\################################################")
+        call append(line(".") - 1,     "")
+    else
+        call append(line(".") - 1,     "\/*************************************************************************")
+        call append(line(".") - 1,     "* COPYRIGHT NOTICE")
+        call append(line(".") - 1,     "*  Copyright (c) 2018, Wuhan Youxuan Stream Education Co., Ltd.")
+        call append(line(".") - 1,     "*  All rights reserved.")
+        call append(line(".") - 1,     "*")
+        call append(line(".") - 1,     "*  @version : 1.0")
+        call append(line(".") - 1,     "*  @author : mxl")
+        call append(line(".") - 1,     "*  @E-mail : xiaolongicx@gmail.com")
+        call append(line(".") - 1,     "*  @date : ".strftime("%Y-%m-%d %H:%M"))
+        call append(line(".") - 1,     "*")
+        call append(line(".") - 1,     "*  Revision Notes :")
+        call append(line(".") - 1,     "*/")
+
+        if &filetype == 'cpp'
+            call append(line(".") - 1, "")
+            call append(line(".") - 1, "#include <iostream>")
+            call append(line(".") - 1, "")
+            call append(line(".") - 1, "using namespace std;")
+        elseif &filetype == 'c'
+            call append(line(".") - 1, "")
+            call append(line(".") - 1, "#include <stdio.h>")
+        endif
+
+        call append(line(".") - 1,     "")
+    endif
+
+    "新建文件后，自动定位到文件末尾
+    exec "lan zh_CN.utf-8"
+    "autocmd BufNewFile * normal G
+    normal G
+endfunc
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 实用设置
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -73,23 +169,23 @@ set fileencoding=utf-8
 "共享剪贴板
 set clipboard+=unnamed
 "从不备份
-set nobackup
+" set nobackup
 "make 运行
 "set makeprg=g++\ -Wall\ \ %
 "自动保存
 "set autowrite
 "set ruler                   " 打开状态栏标尺
-set cursorline              " 突出显示当前行
-set magic                   " 设置魔术
+" set cursorline              " 突出显示当前行
+" set magic                   " 设置魔术
 set guioptions-=T           " 隐藏工具栏
 set guioptions-=m           " 隐藏菜单栏
 " 设置在状态行显示的信息
-set foldcolumn=0
+"set foldcolumn=0
 "set foldmethod=indent
 "set foldlevel=3
 "set foldenable              " 开始折叠
 " 不要使用vi的键盘模式，而是vim自己的
-set nocompatible
+" set nocompatible
 " 语法高亮
 "set syntax=on
 syntax enable
@@ -104,12 +200,12 @@ set cindent
 " Tab键的宽度
 set tabstop=4
 " 统一缩进为4
-set softtabstop=4
-set shiftwidth=4
+"set softtabstop=4
+"set shiftwidth=4
 " 不要用空格代替制表符
-" set noexpandtab
-set expandtab
-autocmd FileType c,cpp set expandtab
+set noexpandtab
+" set expandtab
+autocmd FileType c,cpp,python,java,sh,go set shiftwidth=4 | set expandtab
 " 在行和段开始处使用制表符
 "set smarttab
 " 历史记录数
@@ -119,11 +215,13 @@ set nobackup
 set noswapfile
 "搜索忽略大小写
 set ignorecase
+" 如果有一个大写字母，则切换到大小写敏感查找
+set smartcase
 "搜索逐字符高亮
 set hlsearch
 set incsearch
 "行内替换
-set gdefault
+" set gdefault
 "编码设置
 "set enc=utf-8
 "set fencs=utf-8
@@ -138,7 +236,7 @@ set laststatus=2
 " 命令行（在状态行下）的高度，默认为1，这里是2
 set cmdheight=2
 " 侦测文件类型
-"filetype on
+filetype on
 " 载入文件类型插件
 "filetype plugin on
 " 为特定文件类型载入相关缩进文件
